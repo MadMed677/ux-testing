@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import ParameterItem from '../parameter-item/parameter-item.react';
 
 export default class App extends Component {
     state: {
         testName: string,
-        parameters: Array<string>
-    } = {}
+        parameters: Array<{ name: string, value: string }>
+    } = {
+        parameters: []
+    }
 
     /**
      * On changed test name
@@ -16,6 +19,18 @@ export default class App extends Component {
     onChangeTestName = (e: Event): void => {
         this.setState({
             testName: e.target.value
+        });
+    }
+
+    onValueChanged = (parameter: { name: string, value: string }) => {
+        this.setState({
+            parameters: this.state.parameters.map(item => {
+                if (item.name === parameter.name) {
+                    return { name: parameter.name, value: parameter.value };
+                }
+
+                return item;
+            })
         });
     }
 
@@ -40,11 +55,21 @@ export default class App extends Component {
             // }),
             body: JSON.stringify(request)
         });
-        const parameters: Array<string> = await response.json().parameters;
-        console.log('reponse: ', parameters);
+
+        const { parameters } = await response.json();
+        this.setState({
+            parameters: parameters.map(item => ({ name: item, value: '' }))
+        });
+        console.log(this.state.parameters);
     }
     
     render() {
+        const $parameters = this.state.parameters.map(parameter =>
+            <ParameterItem key={`parameter-item-${parameter.name}`} name={ parameter.name } onValueChanged={ this.onValueChanged } />
+        );
+
+        console.log('parameters: ', this.state.parameters);
+
         return (
             <div className="container">
                 <div className="header"></div>
@@ -58,6 +83,12 @@ export default class App extends Component {
                         <div className="input-group-btn">
                             <button className="btn btn-default" onClick={ this.onTestNameSave.bind(this) }>Save</button>
                         </div>
+                    </div>
+
+                    <div>
+                        <hr/>
+
+                        { $parameters }
                     </div>
                 </section>
                 <footer className="footer"></footer>

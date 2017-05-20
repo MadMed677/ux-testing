@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 
 export default class App extends Component {
     state: {
-        testName: string
+        testName: string,
+        parameters: Array<string>
     } = {}
 
     /**
@@ -18,7 +19,12 @@ export default class App extends Component {
         });
     }
 
-    async onTestNameSave() {
+    /**
+     * Request parameters from API
+     *
+     * @return {Promise.<*>}
+     */
+    async onTestNameSave(): Promise<*> {
         const request = {
             testName: this.state.testName
         };
@@ -34,8 +40,8 @@ export default class App extends Component {
             // }),
             body: JSON.stringify(request)
         });
-        const json = await response.json();
-        console.log('reponse: ', json);
+        const parameters: Array<string> = await response.json().parameters;
+        console.log('reponse: ', parameters);
     }
     
     render() {

@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import ParameterItem from '../parameter-item/parameter-item.react';
 
 import StepperContainer from '../stepper/stepper.react';
-import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
 
 injectTapEventPlugin();
 
@@ -18,19 +14,14 @@ export default class App extends Component {
     }
 
     /**
-     * On changed test name
+     * On parameter value changed
      *
-     * @param {Event} e - event
+     * @param {object} parameter - parameter information
      *
      * @return {void}
+     * @private
      */
-    onChangeTestName = (e: Event): void => {
-        this.setState({
-            testName: e.target.value
-        });
-    }
-
-    onValueChanged = (parameter: { name: string, value: string }) => {
+    _onParameterValueChanged = (parameter: { name: string, value: string }) => {
         this.setState({
             parameters: this.state.parameters.map(item => {
                 if (item.name === parameter.name) {
@@ -46,12 +37,13 @@ export default class App extends Component {
     /**
      * Request parameters from API
      *
+     * @param {string} testName - название теста
+     *
      * @return {Promise.<*>}
      */
-    async onTestNameSave(): Promise<*> {
-        const request = {
-            testName: this.state.testName
-        };
+    async onTestNameSave(testName: string): Promise<*> {
+        const request = { testName };
+        console.log('testName: ', testName);
 
         const response = await fetch('http://localhost:3334/', {
             method: 'POST',
@@ -70,15 +62,10 @@ export default class App extends Component {
             parameters: parameters.map(item => ({ name: item, value: '' }))
         });
 
-        console.log(this.state.parameters);
     }
-    
-    render() {
-        const $parameters = this.state.parameters.map(parameter =>
-            <ParameterItem key={`parameter-item-${parameter.name}`} name={ parameter.name } onValueChanged={ this.onValueChanged } />
-        );
 
-        console.log('parameters: ', this.state.parameters);
+    render() {
+        console.log(this.state.parameters);
 
         return (
             <div className="container">
@@ -87,13 +74,11 @@ export default class App extends Component {
 
                     <hr/>
 
-                    <StepperContainer onTestNameSaved={ this.onTestNameSave.bind(this) } />
-
-                    <div>
-                        <hr/>
-
-                        { $parameters }
-                    </div>
+                    <StepperContainer
+                        onTestNameSaved={ this.onTestNameSave.bind(this) }
+                        parameters={ this.state.parameters }
+                        onParameterValueChanged={ this._onParameterValueChanged }
+                    />
                 </section>
             </div>
         );

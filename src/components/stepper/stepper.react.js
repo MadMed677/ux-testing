@@ -8,9 +8,18 @@ import {
 } from 'material-ui/Stepper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import {
+    Table,
+    TableBody,
+    TableHeader,
+    TableHeaderColumn,
+    TableRow,
+    TableRowColumn
+} from 'material-ui/Table';
 
 export default class StepperContainer extends Component {
     state: {
+        testName: string,
         stepIndex: number,
         finished: boolean
     } = {
@@ -19,7 +28,10 @@ export default class StepperContainer extends Component {
     };
 
     props: {
-        onTestNameSaved: () => mixed
+        onTestNameSaved: () => mixed,
+        parameters: Array<{ name: string, value: string }>
+    } = {
+        parameters: []
     }
 
     handleNext = () => {
@@ -63,19 +75,46 @@ export default class StepperContainer extends Component {
         );
     }
 
-    onTestNameSave = () => {
-        this.props.onTestNameSaved();
+    /**
+     * On changed test name
+     *
+     * @param {Event} e - event
+     *
+     * @return {void}
+     */
+    onChangeTestName = (e: Event): void => {
+        this.setState({
+            testName: e.target.value
+        });
+    }
+
+    /**
+     * Test name saved
+     *
+     * @return {void}
+     */
+    onTestNameSave = (): void => {
+        this.props.onTestNameSaved(this.state.testName);
         this.handleNext();
     }
 
     render() {
+        const $parameters = this.props.parameters.map(parameter =>
+            <TableRow key={`table-row-${parameter.name}`}>
+                <TableRowColumn style={{ textAlign: 'right' }}>{ parameter.name }</TableRowColumn>
+                <TableRowColumn>
+                    <TextField hintText="some hint" onChange={ (e) => this.props.onParameterValueChanged({ name: parameter.name, value: e.target.value }) } />
+                </TableRowColumn>
+            </TableRow>
+        );
+
         return (
             <Stepper activeStep={ this.state.stepIndex } orientation="vertical">
                 <Step>
                     <StepLabel>Write test name</StepLabel>
                     <StepContent>
                         <div className="row">
-                            <div className="col-sm-6" style={{ 'text-align': 'right' }}>
+                            <div className="col-sm-6" style={{ textAlign: 'right' }}>
                                 <TextField hintText="Input test name" onChange={ this.onChangeTestName } />
                             </div>
                             <div className="col-sm-6">
@@ -87,10 +126,19 @@ export default class StepperContainer extends Component {
                     </StepContent>
                 </Step>
                 <Step>
-                    <StepLabel>Select 2</StepLabel>
+                    <StepLabel>Add test argument values</StepLabel>
                     <StepContent>
-                        <TextField hintText="Input test name" onChange={ this.onChangeTestName } />
-                        <RaisedButton label="Save" onTouchTap={ this.onTestNameSave.bind(this) } />
+                        <Table selectable={ false }>
+                            <TableHeader displaySelectAll={ false } enableSelectAll={ false }>
+                                <TableRow>
+                                    <TableHeaderColumn>Test argument value</TableHeaderColumn>
+                                    <TableHeaderColumn>Value</TableHeaderColumn>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody selectable={ false } displayRowCheckbox={ false }>
+                                { $parameters }
+                            </TableBody>
+                        </Table>
 
                         { this.$stepActions(1) }
                     </StepContent>

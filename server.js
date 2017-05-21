@@ -23,11 +23,11 @@ app.get('/test/:testName', (req, res) => {
                     failed: [
                         {
                             verdict: 'no verdict',
-                            logs_uri: ['https://ya.ru', 'https://google.com']
+                            logs_uri: ['https://ya.ru', 'https://oktetlabs.ru/~tester-l5/night-testing/Linux-v5_tot/16.04/session_16.04.22/22.40-l5elrond-ul32-4.5.0-1-686-pae-small_spin-phys_mode-loop4-tcp_no_delack-default_epoll-fdtable_strict-socket_cache-!EPOLL-REST/html/node_27333.html']
                         },
                         {
                             verdict: 'another verdict',
-                            logs_uri: ['https://ya.ru', 'https://google.com']
+                            logs_uri: ['https://ya.ru', 'https://google.com', 'http://anothersite.com']
                         }
                     ],
                     succeded: [

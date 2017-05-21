@@ -119,7 +119,9 @@ export default class StepperContainer extends Component {
      */
     async onTestNameSave(): Promise<*> {
         const { testName } = this.state;
-        const response = await fetch(`http://localhost:3334/test/${testName}/arguments`);
+        const response = await fetch(`http://localhost:3334/test/${testName}/arguments`, {
+            mode: 'cors'
+        });
 
         const parameters = await response.json();
         this.setState({
@@ -307,7 +309,9 @@ export default class StepperContainer extends Component {
             .filter(item => typeof item !== 'undefined')
             .join('&');
 
-        const response = await fetch(`http://localhost:3334/test/${this.state.testName}`);
+        const response = await fetch(`http://localhost:3334/test/${this.state.testName}`, {
+            mode: 'cors'
+        });
         const data = await response.json();
 
         this.setState({ testInformation: data });

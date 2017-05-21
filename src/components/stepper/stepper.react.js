@@ -22,6 +22,8 @@ import {
 import Paper from 'material-ui/Paper';
 import map from 'lodash/map';
 
+import CONFIG from '../../config';
+
 import StepperTestName from './__test-name/stepper__test-name.react';
 import StepperVisualizeData from './__visualize-data/stepper__visualize-data.react';
 
@@ -119,7 +121,7 @@ export default class StepperContainer extends Component {
      */
     async onTestNameSave(): Promise<*> {
         const { testName } = this.state;
-        const response = await fetch(`http://localhost:3334/test/${testName}/arguments`, {
+        const response = await fetch(`${CONFIG.BASE_URL}/test/${testName}/arguments`, {
             mode: 'cors'
         });
 
@@ -309,7 +311,7 @@ export default class StepperContainer extends Component {
             .filter(item => typeof item !== 'undefined')
             .join('&');
 
-        const response = await fetch(`http://localhost:3334/test/${this.state.testName}`, {
+        const response = await fetch(`${CONFIG.BASE_URL}/test/${this.state.testName}`, {
             mode: 'cors'
         });
         const data = await response.json();

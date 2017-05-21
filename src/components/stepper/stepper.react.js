@@ -10,7 +10,6 @@ import {
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import DatePicker from 'material-ui/DatePicker';
-import Checkbox from 'material-ui/Checkbox';
 import Toggle from 'material-ui/Toggle';
 import {
     Table,
@@ -275,6 +274,26 @@ export default class StepperContainer extends Component {
         });
     }
 
+    async _saveAdditionData() {
+        const queryData = {
+            start_date: this.state.startDate,
+            end_date: this.state.endDate,
+            tags_filters: this.state.tagsFilter,
+            parameters: JSON.stringify(this.state.parameters),
+            broken_session: this.state.isBrokenSession,
+            group_logs: this.state.isGroupLogs,
+            include_at_least_one_result: this.state.isIncludeAtLeastOneResult,
+            include_result_with_error: this.state.isIncludeResultWithError,
+            hash: this.state.hash,
+            verdict: this.state.verdict,
+            bug_id: this.state.bugId,
+            failed: this.state.isFailed,
+            succeeded: this.state.isSucceeded
+        };
+        console.log('queryData: ', queryData);
+        this.handleNext();
+    }
+
     render() {
         const $parameters = this.state.parameters.map(parameter =>
             <TableRow key={`table-row-${parameter.name}`}>
@@ -300,8 +319,6 @@ export default class StepperContainer extends Component {
                                 <RaisedButton label="Save" onTouchTap={ this.onTestNameSave.bind(this) } />
                             </div>
                         </div>
-
-                        { this.$stepActions(0) }
                     </StepContent>
                 </Step>
                 <Step>
@@ -445,7 +462,20 @@ export default class StepperContainer extends Component {
                             </TableBody>
                         </Table>
 
-                        { this.$stepActions(1) }
+                        <RaisedButton
+                            label="Save"
+                            disableTouchRipple={ true }
+                            disableFocusRipple={ true }
+                            primary={ true }
+                            onTouchTap={ this._saveAdditionData.bind(this) }
+                            style={{ marginRight: 12 }}
+                        />
+                        <RaisedButton
+                            label="Back"
+                            disableTouchRipple={ true }
+                            disableFocusRipple={ true }
+                            onTouchTap={ this.handlePrev }
+                        />
                     </StepContent>
                 </Step>
                 <Step>

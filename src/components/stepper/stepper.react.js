@@ -8,6 +8,7 @@ import {
 } from 'material-ui/Stepper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import DatePicker from 'material-ui/DatePicker';
 import {
     Table,
     TableBody,
@@ -21,7 +22,9 @@ export default class StepperContainer extends Component {
     state: {
         testName: string,
         stepIndex: number,
-        finished: boolean
+        finished: boolean,
+        startDate: string,
+        endDate: string
     } = {
         stepIndex: 0,
         finished: false
@@ -73,6 +76,15 @@ export default class StepperContainer extends Component {
                 )}
             </div>
         );
+    }
+
+    _onDateChanged = (e: Event, date: string, field: 'start' | 'end') => {
+        console.log('date: ', date);
+        if ( field === 'start' ) {
+            this.setState({ startDate: date });
+        } else {
+            this.setState({ endDate: date });
+        }
     }
 
     /**
@@ -131,12 +143,57 @@ export default class StepperContainer extends Component {
                         <Table selectable={ false }>
                             <TableHeader displaySelectAll={ false } enableSelectAll={ false }>
                                 <TableRow>
-                                    <TableHeaderColumn>Test argument value</TableHeaderColumn>
+                                    <TableHeaderColumn style={{ textAlign: 'right' }}>Test argument value</TableHeaderColumn>
                                     <TableHeaderColumn>Value</TableHeaderColumn>
                                 </TableRow>
                             </TableHeader>
-                            <TableBody selectable={ false } displayRowCheckbox={ false }>
+                            <TableBody selectable={ false } displayRowCheckbox={ false } stripedRows={ false }>
                                 { $parameters }
+                                <TableRow>
+                                    <TableHeaderColumn colSpan="2" style={{ textAlign: 'center' }}>
+                                        Addition values
+                                    </TableHeaderColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableHeaderColumn style={{ textAlign: 'right' }}>Name</TableHeaderColumn>
+                                    <TableHeaderColumn>Value</TableHeaderColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Start date</TableRowColumn>
+                                    <TableRowColumn>
+                                        <DatePicker
+                                            hintText="Select start date"
+                                            autoOk={ true }
+                                            defaultDate={ this.state.startDate }
+                                            maxDate={ this.state.endDate }
+                                            formatDate={ new Intl.DateTimeFormat('en-US', {
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            }).format}
+                                            mode="landscape"
+                                            onChange={ (e, date) => this._onDateChanged(e, date, 'start') }
+                                        />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>End date</TableRowColumn>
+                                    <TableRowColumn>
+                                        <DatePicker
+                                            hintText="Select end date"
+                                            autoOk={ true }
+                                            defaultDate={ this.state.endDate }
+                                            minDate={ this.state.startDate }
+                                            formatDate={ new Intl.DateTimeFormat('en-US', {
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            }).format}
+                                            mode="landscape"
+                                            onChange={ (e, date) => this._onDateChanged(e, date, 'end') }
+                                        />
+                                    </TableRowColumn>
+                                </TableRow>
                             </TableBody>
                         </Table>
 

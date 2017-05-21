@@ -19,6 +19,7 @@ import {
     TableRow,
     TableRowColumn
 } from 'material-ui/Table';
+import map from 'lodash/map';
 
 export default class StepperContainer extends Component {
     state: {
@@ -276,8 +277,8 @@ export default class StepperContainer extends Component {
 
     async _saveAdditionData() {
         const queryData = {
-            start_date: this.state.startDate,
-            end_date: this.state.endDate,
+            start_date: this.state.startDate && this.state.startDate.getTime(),
+            end_date: this.state.endDate && this.state.endDate.getTime(),
             tags_filters: this.state.tagsFilter,
             parameters: JSON.stringify(this.state.parameters),
             broken_session: this.state.isBrokenSession,
@@ -291,6 +292,21 @@ export default class StepperContainer extends Component {
             succeeded: this.state.isSucceeded
         };
         console.log('queryData: ', queryData);
+
+        const queryString = map(queryData, (value, key) => {
+            if ( typeof value === 'undefined' ) {
+                return;
+            }
+
+            return encodeURIComponent(key) + '=' + encodeURIComponent(value);
+        })
+            .filter(item => typeof item !== 'undefined')
+            .join('&');
+
+        console.log('queryString: ', queryString);
+
+        // fetch();
+
         this.handleNext();
     }
 

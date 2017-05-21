@@ -1,4 +1,4 @@
 ### Install
 
-- Download []nodejs](https://nodejs.org/en/)
+- Download [nodejs](https://nodejs.org/en/)
 - npm start

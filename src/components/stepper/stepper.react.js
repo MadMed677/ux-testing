@@ -23,8 +23,10 @@ export default class StepperContainer extends Component {
         testName: string,
         stepIndex: number,
         finished: boolean,
+
         startDate: string,
-        endDate: string
+        endDate: string,
+        tagsFilter: string
     } = {
         stepIndex: 0,
         finished: false
@@ -78,13 +80,25 @@ export default class StepperContainer extends Component {
         );
     }
 
-    _onDateChanged = (e: Event, date: string, field: 'start' | 'end') => {
+    _onDateChanged = (e: Event, date: string, field: 'start' | 'end'): void => {
         console.log('date: ', date);
         if ( field === 'start' ) {
             this.setState({ startDate: date });
         } else {
             this.setState({ endDate: date });
         }
+    }
+
+    /**
+     * On tag filter changed
+     *
+     * @param {event} e - event
+     *
+     * @return {void}
+     * @private
+     */
+    _onTagFilterChanged = (e: Event): void => {
+        this.setState({ tagsFilter: e.target.value });
     }
 
     /**
@@ -192,6 +206,12 @@ export default class StepperContainer extends Component {
                                             mode="landscape"
                                             onChange={ (e, date) => this._onDateChanged(e, date, 'end') }
                                         />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Tags filter</TableRowColumn>
+                                    <TableRowColumn>
+                                        <TextField hintText="tag1=value1,tag2=value2" onChange={ this._onTagFilterChanged } />
                                     </TableRowColumn>
                                 </TableRow>
                             </TableBody>

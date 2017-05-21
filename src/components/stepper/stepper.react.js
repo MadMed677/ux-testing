@@ -21,6 +21,8 @@ import {
 } from 'material-ui/Table';
 import map from 'lodash/map';
 
+import StepperTestName from './__test-name/stepper__test-name.react';
+
 export default class StepperContainer extends Component {
     state: {
         testName: string,
@@ -302,8 +304,6 @@ export default class StepperContainer extends Component {
             .filter(item => typeof item !== 'undefined')
             .join('&');
 
-        console.log('queryString: ', queryString);
-
         const response = await fetch(`http://localhost:3334/test/${this.state.testName}`);
         const data = await response.json();
         console.log('data: ', data);
@@ -321,21 +321,15 @@ export default class StepperContainer extends Component {
             </TableRow>
         );
 
-        console.log('state: ', this.state);
-
         return (
             <Stepper activeStep={ this.state.stepIndex } orientation="vertical">
                 <Step>
                     <StepLabel>Write test name</StepLabel>
                     <StepContent>
-                        <div className="row">
-                            <div className="col-sm-6" style={{ textAlign: 'right' }}>
-                                <TextField hintText="Input test name" onChange={ this.onChangeTestName } />
-                            </div>
-                            <div className="col-sm-6">
-                                <RaisedButton label="Save" onTouchTap={ this.onTestNameSave.bind(this) } />
-                            </div>
-                        </div>
+                        <StepperTestName
+                            onChangeTestName={ this.onChangeTestName }
+                            onTestNameSave={ this.onTestNameSave.bind(this) }
+                        />
                     </StepContent>
                 </Step>
                 <Step>

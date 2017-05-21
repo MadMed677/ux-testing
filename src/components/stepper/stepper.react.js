@@ -291,7 +291,6 @@ export default class StepperContainer extends Component {
             failed: this.state.isFailed,
             succeeded: this.state.isSucceeded
         };
-        console.log('queryData: ', queryData);
 
         const queryString = map(queryData, (value, key) => {
             if ( typeof value === 'undefined' ) {
@@ -305,7 +304,9 @@ export default class StepperContainer extends Component {
 
         console.log('queryString: ', queryString);
 
-        // fetch();
+        const response = await fetch(`http://localhost:3334/test/${this.state.testName}`);
+        const data = await response.json();
+        console.log('data: ', data);
 
         this.handleNext();
     }

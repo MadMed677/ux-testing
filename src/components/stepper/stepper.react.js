@@ -279,7 +279,19 @@ export default class StepperContainer extends Component {
                                 <TableRow>
                                     <TableRowColumn style={{ textAlign: 'right' }}>Broken sessions</TableRowColumn>
                                     <TableRowColumn>
-                                        <Checkbox onCheck={ this._onBrokenSessionChecked } />
+                                        <Checkbox
+                                            label="Include"
+                                            onCheck={ this._onBrokenSessionChecked }
+                                        />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Logs grouping</TableRowColumn>
+                                    <TableRowColumn>
+                                        <Checkbox
+                                            label="Group logs by tags"
+                                            onCheck={ this._onGroupLogsChecked }
+                                        />
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow>
@@ -292,15 +304,6 @@ export default class StepperContainer extends Component {
                                         <Checkbox
                                             label="Include only results with error (such as unexpected result)"
                                             onCheck={ (e, isChecked) => this._onResultsFilterChecked(e, isChecked, 'include_result_with_error') }
-                                        />
-                                    </TableRowColumn>
-                                </TableRow>
-                                <TableRow>
-                                    <TableRowColumn style={{ textAlign: 'right' }}>Logs grouping</TableRowColumn>
-                                    <TableRowColumn>
-                                        <Checkbox
-                                            label="Group logs by tags"
-                                            onCheck={ this._onGroupLogsChecked }
                                         />
                                     </TableRowColumn>
                                 </TableRow>

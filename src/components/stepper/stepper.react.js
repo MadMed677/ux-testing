@@ -19,9 +19,11 @@ import {
     TableRow,
     TableRowColumn
 } from 'material-ui/Table';
+import Paper from 'material-ui/Paper';
 import map from 'lodash/map';
 
 import StepperTestName from './__test-name/stepper__test-name.react';
+import StepperVisualizeData from './__visualize-data/stepper__visualize-data.react';
 
 export default class StepperContainer extends Component {
     state: {
@@ -41,7 +43,8 @@ export default class StepperContainer extends Component {
         verdict: string,
         bugId: number | string,
         isFailed: boolean,
-        isSucceeded: boolean
+        isSucceeded: boolean,
+        testInformation: {}
     } = {
         parameters: [],
         stepIndex: 0,
@@ -306,7 +309,8 @@ export default class StepperContainer extends Component {
 
         const response = await fetch(`http://localhost:3334/test/${this.state.testName}`);
         const data = await response.json();
-        console.log('data: ', data);
+
+        this.setState({ testInformation: data });
 
         this.handleNext();
     }
@@ -490,12 +494,9 @@ export default class StepperContainer extends Component {
                     </StepContent>
                 </Step>
                 <Step>
-                    <StepLabel>Select 3</StepLabel>
+                    <StepLabel>Visualize data</StepLabel>
                     <StepContent>
-                        <TextField hintText="Input test name" onChange={ this.onChangeTestName } />
-                        <RaisedButton label="Save" onTouchTap={ this.onTestNameSave.bind(this) } />
-
-                        { this.$stepActions(2) }
+                        <StepperVisualizeData testInformation={ this.state.testInformation } />
                     </StepContent>
                 </Step>
             </Stepper>

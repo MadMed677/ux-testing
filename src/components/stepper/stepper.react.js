@@ -120,7 +120,7 @@ export default class StepperContainer extends Component {
      * @return {Promise.<*>}
      */
     async onTestNameSave(): Promise<*> {
-        const { testName } = this.state;
+        const testName = this.state.testName.replace(/\//g, '_');
         const response = await fetch(`${CONFIG.BASE_URL}/test/${testName}/arguments`, {
             mode: 'cors'
         });

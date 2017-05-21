@@ -174,20 +174,22 @@ export default class StepperVisualizeData extends Component {
         });
 
         return (
-            <Paper zDepth={ 2 }>
-                { $arguments }
+            <div style={{ position: 'relative' }}>
+                <Paper zDepth={ 2 }>
+                    { $arguments }
 
-                <Dialog
-                    title={`Test ${this.props.testInformation.testName}`}
-                    actions={actions}
-                    modal={false}
-                    open={this.state.isModalOpen}
-                    onRequestClose={this.handleClose}
-                    contentStyle={{ width: '80%', height: '50%' }}
-                >
-                    <iframe src={ this.state.currentLog } style={{ width: '100%' , height: '100%', border: 'none' }} />
-                </Dialog>
-            </Paper>
+                    <Dialog
+                        title={`Test ${this.props.testInformation.testName}`}
+                        actions={actions}
+                        modal={false}
+                        open={this.state.isModalOpen}
+                        onRequestClose={this.handleClose}
+                        contentStyle={{ width: '80%', height: '50%' }}
+                    >
+                        <iframe src={ this.state.currentLog } style={{ width: '100%' , height: '100%', border: 'none' }} />
+                    </Dialog>
+                </Paper>
+            </div>
         );
     }
 }

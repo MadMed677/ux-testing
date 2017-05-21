@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 
 import {
@@ -9,6 +10,7 @@ import {
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import DatePicker from 'material-ui/DatePicker';
+import Checkbox from 'material-ui/Checkbox';
 import {
     Table,
     TableBody,
@@ -26,7 +28,11 @@ export default class StepperContainer extends Component {
 
         startDate: string,
         endDate: string,
-        tagsFilter: string
+        tagsFilter: string,
+        isBrokenSession: boolean,
+        isGroupLogs: boolean,
+        isIncludeAtLeastOneResult: boolean,
+        isIncludeResultWithError: boolean
     } = {
         stepIndex: 0,
         finished: false
@@ -80,6 +86,16 @@ export default class StepperContainer extends Component {
         );
     }
 
+    /**
+     * On data was changed
+     *
+     * @param {event} e - event
+     * @param {string} date
+     * @param {string} field - field name ('start' or 'end')
+     *
+     * @return {void}
+     * @private
+     */
     _onDateChanged = (e: Event, date: string, field: 'start' | 'end'): void => {
         console.log('date: ', date);
         if ( field === 'start' ) {
@@ -99,6 +115,52 @@ export default class StepperContainer extends Component {
      */
     _onTagFilterChanged = (e: Event): void => {
         this.setState({ tagsFilter: e.target.value });
+    }
+
+    /**
+     * On broken_session checked
+     *
+     * @param {event} e
+     * @param {boolean} isChecked - is checkbox checked
+     *
+     * @return {void}
+     * @private
+     */
+    _onBrokenSessionChecked = (e: Event, isChecked: boolean): void => {
+        this.setState({
+            isBrokenSession: isChecked
+        });
+    }
+
+    /**
+     * On results filter checked
+     *
+     * @param {event} e
+     * @param {boolean} isChecked
+     * @param {string} field
+     *
+     * @return {void}
+     * @private
+     */
+    _onResultsFilterChecked = (e: Event, isChecked: boolean, field: 'include_at_least_one_result' | 'include_result_with_error'): void => {
+        if ( field === 'include_at_least_one_result' ) {
+            this.setState({ isIncludeAtLeastOneResult: isChecked });
+        } else {
+            this.setState({ isIncludeResultWithError: isChecked });
+        }
+    }
+
+    /**
+     * On group logs checked
+     *
+     * @param {event} e
+     * @param {boolean} isChecked
+     *
+     * @return {void}
+     * @private
+     */
+    _onGroupLogsChecked = (e: Event, isChecked: boolean): void => {
+        this.setState({ isGroupLogs: isChecked });
     }
 
     /**
@@ -212,6 +274,34 @@ export default class StepperContainer extends Component {
                                     <TableRowColumn style={{ textAlign: 'right' }}>Tags filter</TableRowColumn>
                                     <TableRowColumn>
                                         <TextField hintText="tag1=value1,tag2=value2" onChange={ this._onTagFilterChanged } />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Broken sessions</TableRowColumn>
+                                    <TableRowColumn>
+                                        <Checkbox onCheck={ this._onBrokenSessionChecked } />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Results filter</TableRowColumn>
+                                    <TableRowColumn>
+                                        <Checkbox
+                                            label="Include only iterations having at least one result with error (such as unexpected result)"
+                                            onCheck={ (e, isChecked) => this._onResultsFilterChecked(e, isChecked, 'include_at_least_one_result') }
+                                        />
+                                        <Checkbox
+                                            label="Include only results with error (such as unexpected result)"
+                                            onCheck={ (e, isChecked) => this._onResultsFilterChecked(e, isChecked, 'include_result_with_error') }
+                                        />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Logs grouping</TableRowColumn>
+                                    <TableRowColumn>
+                                        <Checkbox
+                                            label="Group logs by tags"
+                                            onCheck={ this._onGroupLogsChecked }
+                                        />
                                     </TableRowColumn>
                                 </TableRow>
                             </TableBody>

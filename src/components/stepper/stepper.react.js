@@ -11,6 +11,7 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import DatePicker from 'material-ui/DatePicker';
 import Checkbox from 'material-ui/Checkbox';
+import Toggle from 'material-ui/Toggle';
 import {
     Table,
     TableBody,
@@ -23,6 +24,7 @@ import {
 export default class StepperContainer extends Component {
     state: {
         testName: string,
+        parameters: Array<{ name: string, value: string }>,
         stepIndex: number,
         finished: boolean,
 
@@ -32,18 +34,17 @@ export default class StepperContainer extends Component {
         isBrokenSession: boolean,
         isGroupLogs: boolean,
         isIncludeAtLeastOneResult: boolean,
-        isIncludeResultWithError: boolean
+        isIncludeResultWithError: boolean,
+        hash: string,
+        verdict: string,
+        bugId: number | string,
+        isFailed: boolean,
+        isSucceeded: boolean
     } = {
+        parameters: [],
         stepIndex: 0,
         finished: false
     };
-
-    props: {
-        onTestNameSaved: () => mixed,
-        parameters: Array<{ name: string, value: string }>
-    } = {
-        parameters: []
-    }
 
     handleNext = () => {
         const {stepIndex} = this.state;
@@ -87,6 +88,43 @@ export default class StepperContainer extends Component {
     }
 
     /**
+     * On parameter value changed
+     *
+     * @param {object} parameter - parameter information
+     *
+     * @return {void}
+     * @private
+     */
+    _onParameterValueChanged = (parameter: { name: string, value: string }) => {
+        this.setState({
+            parameters: this.state.parameters.map(item => {
+                if (item.name === parameter.name) {
+                    return { name: parameter.name, value: parameter.value };
+                }
+
+                return item;
+            })
+        });
+    }
+
+    /**
+     * Request parameters from API
+     *
+     * @return {Promise.<*>}
+     */
+    async onTestNameSave(): Promise<*> {
+        const { testName } = this.state;
+        const response = await fetch(`http://localhost:3334/test/${testName}/arguments`);
+
+        const parameters = await response.json();
+        this.setState({
+            parameters: parameters.map(item => ({ name: item, value: '' }))
+        });
+
+        this.handleNext();
+    }
+
+    /**
      * On data was changed
      *
      * @param {event} e - event
@@ -97,7 +135,6 @@ export default class StepperContainer extends Component {
      * @private
      */
     _onDateChanged = (e: Event, date: string, field: 'start' | 'end'): void => {
-        console.log('date: ', date);
         if ( field === 'start' ) {
             this.setState({ startDate: date });
         } else {
@@ -164,6 +201,68 @@ export default class StepperContainer extends Component {
     }
 
     /**
+     * On hash changed
+     *
+     * @param {event} e
+     *
+     * @return {void}
+     * @private
+     */
+    _onHashChanged = (e: Event): void => {
+        this.setState({ hash: e.target.value });
+    }
+
+    /**
+     * On verdict changed
+     *
+     * @param {event} e
+     *
+     * @return {void}
+     * @private
+     */
+    _onVerdictChanged = (e: Event): void => {
+        this.setState({ verdict: e.target.value });
+    }
+
+    /**
+     * On bug id changed
+     *
+     * @param {event} e
+     *
+     * @return {void}
+     * @private
+     */
+    _onBugIdChanged = (e: Event): void => {
+        this.setState({ bugId: parseInt(e.target.value) });
+    }
+
+    /**
+     * Show failed test
+     *
+     * @param {event} e
+     * @param {boolean} isChecked
+     *
+     * @return {void}
+     * @private
+     */
+    _onShowFailedTestChanged = (e: Event, isChecked: boolean): void => {
+        this.setState({ isFailed: isChecked });
+    }
+
+    /**
+     * Show failed test
+     *
+     * @param {event} e
+     * @param {boolean} isChecked
+     *
+     * @return {void}
+     * @private
+     */
+    _onShowSucceededTestChanged = (e: Event, isChecked: boolean): void => {
+        this.setState({ isSucceeded: isChecked });
+    }
+
+    /**
      * On changed test name
      *
      * @param {Event} e - event
@@ -176,25 +275,17 @@ export default class StepperContainer extends Component {
         });
     }
 
-    /**
-     * Test name saved
-     *
-     * @return {void}
-     */
-    onTestNameSave = (): void => {
-        this.props.onTestNameSaved(this.state.testName);
-        this.handleNext();
-    }
-
     render() {
-        const $parameters = this.props.parameters.map(parameter =>
+        const $parameters = this.state.parameters.map(parameter =>
             <TableRow key={`table-row-${parameter.name}`}>
                 <TableRowColumn style={{ textAlign: 'right' }}>{ parameter.name }</TableRowColumn>
                 <TableRowColumn>
-                    <TextField hintText="some hint" onChange={ (e) => this.props.onParameterValueChanged({ name: parameter.name, value: e.target.value }) } />
+                    <TextField hintText="some hint" onChange={ (e) => this._onParameterValueChanged({ name: parameter.name, value: e.target.value }) } />
                 </TableRowColumn>
             </TableRow>
         );
+
+        console.log('state: ', this.state);
 
         return (
             <Stepper activeStep={ this.state.stepIndex } orientation="vertical">
@@ -279,31 +370,75 @@ export default class StepperContainer extends Component {
                                 <TableRow>
                                     <TableRowColumn style={{ textAlign: 'right' }}>Broken sessions</TableRowColumn>
                                     <TableRowColumn>
-                                        <Checkbox
+                                        <Toggle
                                             label="Include"
-                                            onCheck={ this._onBrokenSessionChecked }
+                                            labelPosition="right"
+                                            onToggle={ this._onBrokenSessionChecked }
                                         />
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow>
                                     <TableRowColumn style={{ textAlign: 'right' }}>Logs grouping</TableRowColumn>
                                     <TableRowColumn>
-                                        <Checkbox
+                                        <Toggle
                                             label="Group logs by tags"
-                                            onCheck={ this._onGroupLogsChecked }
+                                            labelPosition="right"
+                                            onToggle={ this._onGroupLogsChecked }
                                         />
                                     </TableRowColumn>
                                 </TableRow>
                                 <TableRow>
                                     <TableRowColumn style={{ textAlign: 'right' }}>Results filter</TableRowColumn>
                                     <TableRowColumn>
-                                        <Checkbox
+                                        <Toggle
                                             label="Include only iterations having at least one result with error (such as unexpected result)"
-                                            onCheck={ (e, isChecked) => this._onResultsFilterChecked(e, isChecked, 'include_at_least_one_result') }
+                                            labelPosition="right"
+                                            onToggle={ (e, isChecked) => this._onResultsFilterChecked(e, isChecked, 'include_at_least_one_result') }
                                         />
-                                        <Checkbox
+                                        <Toggle
                                             label="Include only results with error (such as unexpected result)"
-                                            onCheck={ (e, isChecked) => this._onResultsFilterChecked(e, isChecked, 'include_result_with_error') }
+                                            labelPosition="right"
+                                            onToggle={ (e, isChecked) => this._onResultsFilterChecked(e, isChecked, 'include_result_with_error') }
+                                        />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Hash</TableRowColumn>
+                                    <TableRowColumn>
+                                        <TextField hintText="Hash" onChange={ this._onHashChanged } />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Verdict</TableRowColumn>
+                                    <TableRowColumn>
+                                        <TextField hintText="verdict1,verdict2" onChange={ this._onVerdictChanged } />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Bug Id</TableRowColumn>
+                                    <TableRowColumn>
+                                        <TextField hintText="Bug id" onChange={ this._onBugIdChanged } />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Show failed test</TableRowColumn>
+                                    <TableRowColumn>
+                                        <Toggle
+                                            onToggle={ this._onShowFailedTestChanged }
+                                            labelPosition="right"
+                                            thumbStyle={{ backgroundColor: '#fcc' }}
+                                            trackStyle={{ backgroundColor: '#ff9d9d' }}
+                                            thumbSwitchedStyle={{ backgroundColor: '#f00' }}
+                                            trackSwitchedStyle={{ backgroundColor: '#ff9d9d' }}
+                                        />
+                                    </TableRowColumn>
+                                </TableRow>
+                                <TableRow>
+                                    <TableRowColumn style={{ textAlign: 'right' }}>Show succeeded test</TableRowColumn>
+                                    <TableRowColumn>
+                                        <Toggle
+                                            labelPosition="right"
+                                            onToggle={ this._onShowSucceededTestChanged }
                                         />
                                     </TableRowColumn>
                                 </TableRow>
